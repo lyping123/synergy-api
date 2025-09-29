@@ -23,4 +23,16 @@ class staffController extends Controller
             ]);
         }
     }
+
+    public function fetchAllStaff()
+    {
+        $staff=User::where("staff_id","!=",null)->get();
+        
+        return response()->json([
+            "status"=>200,
+            "message"=>"fetch all staff",
+            "data"=>$staff
+        ]);
+
+    }
 }

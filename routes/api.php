@@ -7,7 +7,8 @@ use Phiki\Grammar\Injections\Prefix;
 
 //prefix
 Route::prefix('v1')->group(function () {
-    Route::get("/staff/{id}",[staffController::class,'findstaff']);
+    // Route::get("/staff/{id}",[staffController::class,'findstaff']);
+    Route::get("/staff/all",[staffController::class,'fetchAllStaff']);
     Route::post("/staff/add",[staffController::class,'addstaff']);
 
     Route::get("/attendance/{date}/count",[attendanceController::class,'countattendance']);
