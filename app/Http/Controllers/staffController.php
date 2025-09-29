@@ -26,7 +26,7 @@ class staffController extends Controller
 
     public function fetchAllStaff()
     {
-        $staff=User::where("staff_id","!=",null)->get();
+        $staff=User::where("staff_id","!=","")->get();
         
         return response()->json([
             "status"=>200,
