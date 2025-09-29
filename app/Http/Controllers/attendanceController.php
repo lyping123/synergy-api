@@ -51,7 +51,32 @@ class attendanceController extends Controller
             "data"=>$attendance
         ]);
     }
-    public function addattendance(Request $request){
+    public function addattendance(Request $request)
+    {
+        $check_staff=User::where('staff_id',$request->input('staff_id'))->first();
+        if(!$check_staff){
+            return response()->json([
+                "status"=>401,
+                "message"=>"Your user account is not been register yet",
+            ]);
+        }
+        $check_scan_in = staff_attendance::where('staff_id', $request->input('staff_id'))
+            ->where('date_checkin', $request->input('date_checkin'))
+            ->orderBy('time_checkin', 'desc')
+            ->first();
+
+        if ($check_scan_in) {
+            $last_checkin_time = strtotime($check_scan_in->time_checkin);
+            $current_checkin_time = strtotime($request->input('time_checkin'));
+
+            if (($current_checkin_time - $last_checkin_time) < 300) { // 300 seconds = 5 minutes
+                return response()->json([
+                    "status" => 401,
+                    "message" => "staff already checked in within 5 minutes, please try again later",
+                ]);
+            }
+        }
+
         $staff_attendance=new staff_attendance();
         $staff_attendance->staff_id=$request->input('staff_id');
         $staff_attendance->time_checkin=$request->input('time_checkin');
