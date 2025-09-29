@@ -42,9 +42,40 @@ class attendanceController extends Controller
             "data"=>$json_staff_attendance
         ]);
     }
+
+    public function check_staff_attendance($date)
+    {
+        $staff=User::where("staff_id","!=","")->get();
+        $attendance=$staff->map(function($user){
+            $check_attendance=staff_attendance::where('staff_id',$user->staff_id)->where('date_checkin',date('Y-m-d'))->first();
+            if($check_attendance){
+                return [
+                    'staff_id'=>$user->staff_id,
+                    'staff_name'=>$user->u_name,
+                    'status'=>true,
+                    'time_checkin'=>$check_attendance->time_checkin,
+                    'time_section'=>$check_attendance->time_section,
+                ];
+            }else{
+                return [
+                    'staff_id'=>$user->staff_id,
+                    'staff_name'=>$user->u_name,
+                    'status'=>false,
+                    'time_checkin'=>null,
+                    'time_section'=>null,
+                ];
+            }
+         });
+        return response()->json([
+            "status"=>200,
+            "message"=>"fetch staff attendance",
+            "data"=>$attendance
+        ]);
+    }
     public function last_checkin($staff_id,$date)
     {
-        $attendance=staff_attendance::where('staff_id',$staff_id)->where('date_checkin',$date)->orderBy('id','desc')->first();
+        $attendance=staff_attendance::where('staff_id',$staff_id)->where('date_checkin',$date)->orderBy('id','asc')->first();
+        
         return response()->json([
             "status"=>200,
             "message"=>"fetch last checkin",

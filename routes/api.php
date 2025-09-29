@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get("/attendance/{date}/count",[attendanceController::class,'countattendance']);
     Route::get("/attendance/{date}/all",[attendanceController::class,'fetchattendance']);
+    Route::get("/attendance/{date}/staff",[attendanceController::class,'check_staff_attendance']);
     Route::get("attendance/last_checkin/{staff_id}/{date}",[attendanceController::class,'last_checkin']);
     Route::post("/attendance/add",[attendanceController::class,'addattendance']);
     Route::put("/attendance/{id}/update",[attendanceController::class,'updateattendance']);
