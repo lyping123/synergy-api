@@ -60,8 +60,13 @@ class studentController extends Controller
         ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
         ->where('s.h_status', 'YES')
         ->where('s.s_status', 'ACTIVE')
-        ->selectRaw('MIN(f.id) as receipt_id, MIN(f.r_date) as first_payment_date,s.s_name,fd.rp_amount')
-        ->groupBy('s.s_name','fd.rp_amount')
+        ->selectRaw("
+            s.s_name,
+            SUBSTRING_INDEX(GROUP_CONCAT(f.id ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS receipt_id,
+            SUBSTRING_INDEX(GROUP_CONCAT(f.r_date ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS first_payment_date,
+            SUBSTRING_INDEX(GROUP_CONCAT(fd.rp_amount ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS rp_amount
+        ")
+        ->groupBy('s.s_name')
         ->get();
 
         $reminders = [];
@@ -72,7 +77,7 @@ class studentController extends Controller
             $monthsDifference = ($interval->y * 12) + $interval->m;
 
 
-            $periodFee = $fee->rp_amount;
+            $periodFee =$fee->rp_amount;
 
             // Count the number of 6-month periods started (includes current period)
             $periodsElapsed = intdiv($monthsDifference, 6) + 1;
