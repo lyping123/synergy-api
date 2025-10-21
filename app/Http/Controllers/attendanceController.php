@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\apply_leave_list;
+use App\Models\mail_log;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\staff_attendance;
@@ -153,6 +155,58 @@ class attendanceController extends Controller
         return response()->json([
             "status"=>401,
             "message"=>"delete attendance",
+        ]);
+    }
+    public function todayattendance()
+    {
+        $staff=User::where("staff_id","!=","")->get();
+        $attendance=$staff->map(function($user){
+            $date_today=date('Y-m-d');
+            $check_attendance=staff_attendance::where('staff_id',$user->staff_id)->where('date_checkin',$date_today)->first();
+            
+            if(!$check_attendance){
+                $appy_leave = apply_leave_list::where('u_id', $user->id)
+                    ->whereRaw("STR_TO_DATE(a_from, '%d-%m-%Y') <= ?", [$date_today])
+                    ->whereRaw("STR_TO_DATE(a_to,   '%d-%m-%Y') >= ?", [$date_today])
+                    ->count();
+                
+                $status=$appy_leave>0 ? 'apply leave today' : 'absent today';
+                return [
+                    'staff_name'=>$user->u_name,
+                    'status'=>$status,
+                ];
+            }
+         });
+        return response()->json([
+            "status"=>200,
+            "message"=>"fetch today attendance",
+            "data"=>$attendance
+        ]);
+    }
+    public function reminder_apply_leave()
+    {
+        // Group all dates per user id for ACTIVE status
+        // Note: selectRaw expects only the select list, not the leading SELECT keyword
+        $mail_log = mail_log::selectRaw(
+                "u_id, GROUP_CONCAT(DISTINCT `date` ORDER BY `date` ASC SEPARATOR ', ') as group_date"
+            )
+            ->where('s_status', 'ACTIVE')
+            ->groupBy('u_id')
+            ->get();
+        
+        $mail_log = $mail_log->map(function($log) {
+            $user = User::find($log->u_id);
+            return [
+                'u_id' => $log->u_id,
+                'staff_name' => $user ? $user->u_name : null,
+                'staff_email' => $user ? $user->u_email : null,
+                'group_date' => $log->group_date,
+            ];
+        });
+        return response()->json([
+            "status" => 200,
+            "message" => "fetch reminder apply leave grouped dates",
+            "data" => $mail_log,
         ]);
     }
 }

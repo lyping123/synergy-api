@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\attendanceController;
-use App\Http\Controllers\staffController;
-use Illuminate\Support\Facades\Route;
 use Phiki\Grammar\Injections\Prefix;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\staffController;
+use App\Http\Controllers\studentController;
+use App\Http\Controllers\attendanceController;
 
 //prefix
 Route::prefix('v1')->group(function () {
@@ -18,5 +19,12 @@ Route::prefix('v1')->group(function () {
     Route::post("/attendance/add",[attendanceController::class,'addattendance']);
     Route::put("/attendance/{id}/update",[attendanceController::class,'updateattendance']);
     Route::delete("/attendance/{id}/delete",[attendanceController::class,'deleteattendance']);
+    Route::get("/attendance/today",[attendanceController::class,'todayattendance']);
+
+
+    Route::get("/reminder/apply_leave",[attendanceController::class,'reminder_apply_leave']);
+
+    Route::get("/reminder/tuition_fee",[studentController::class,'remind_tuition_fee']);
+    Route::get("/reminder/hostel_fee",[studentController::class,'remind_hostel_fee']);
 });
 
