@@ -26,7 +26,19 @@ class studentController extends Controller
             ->selectRaw('SUM(fd.rp_amount) as total_amount')
             ->groupBy('f.s_id')
             ->get();
+
+            $ptpk_receipt=$connection->table('f_receipt as f')
+            ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
+            ->where('f.s_id', $fee->id)
+            ->where('f.r_status','ACTIVE')
+            ->where('f.cash_bill_option','Tuition PTPK')
+            ->whereBetween('f.r_date',[date('2024-07-01'),date('2024-07-31')])         
+            ->selectRaw('SUM(fd.rp_amount) as total_amount')
+            ->groupBy('f.s_id')
+            ->get();
+
             $totalfee-=$f_receipt->first()->total_amount??0;
+            $totalfee-=$ptpk_receipt->first()->total_amount??0;
             if($totalfee>0){
                 $reminders[]=[
                     "s_name"=>$fee->s_name,
@@ -65,7 +77,7 @@ class studentController extends Controller
             // Count the number of 6-month periods started (includes current period)
             $periodsElapsed = intdiv($monthsDifference, 6) + 1;
 
-            $totalHostelFee = $periodsElapsed * $periodFee;
+            $totalHostelFee = $periodsElapsed * (int)$periodFee;
 
             $f_receipt=$connection->table('f_receipt as f')
             ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
