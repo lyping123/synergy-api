@@ -102,7 +102,7 @@ class studentController extends Controller
         return response()->json([
             "status" => 200,
             "message" => "fetch hostel fee reminder",
-            "data" => $hostelFees
+            "data" => $reminders
         ]);
     }
 }
