@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 class studentController extends Controller
 {
+    public $phone_number;
+
+    public function __construct()
+    {
+        $this->phone_number = env('WHATSAPP_PHONE_NUMBER', '+60129253398');
+    }
+    
+
     public function remind_tuition_fee()
     {
         $connection = DB::connection('student_registration');
@@ -49,6 +57,7 @@ class studentController extends Controller
         return response()->json([
             "status" => 200,
             "message" => "fetch tuition fee reminder",
+            "phone_number"=>$this->phone_number,
             "data" => $reminders
         ]);
     }
@@ -107,6 +116,7 @@ class studentController extends Controller
         return response()->json([
             "status" => 200,
             "message" => "fetch hostel fee reminder",
+            "phone_number"=>$this->phone_number,
             "data" => $reminders
         ]);
     }

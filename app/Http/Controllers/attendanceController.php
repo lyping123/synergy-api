@@ -10,9 +10,16 @@ use App\Models\staff_attendance;
 
 class attendanceController extends Controller
 {
+    public $phone_number;
+    public function __construct()
+    {
+        $this->phone_number = env('WHATSAPP_PHONE_NUMBER', '+60129253398');
+    }
+
     public function countattendance($date){
         
         $count_staff_attendance = staff_attendance::where('date_checkin', $date)
+        ->d
         ->distinct('staff_id')
         ->count('staff_id');
         
@@ -180,6 +187,7 @@ class attendanceController extends Controller
         return response()->json([
             "status"=>200,
             "message"=>"fetch today attendance",
+            "phone_number"=>$this->phone_number,
             "data"=>$attendance
         ]);
     }
@@ -206,6 +214,7 @@ class attendanceController extends Controller
         return response()->json([
             "status" => 200,
             "message" => "fetch reminder apply leave grouped dates",
+            "phone_number" => $this->phone_number,
             "data" => $mail_log,
         ]);
     }
