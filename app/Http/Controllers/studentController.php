@@ -67,7 +67,8 @@ class studentController extends Controller
         $hostelFees = $connection->table('student as s')
         ->join('f_receipt as f','f.s_id','=','s.id')
         ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
-        ->where('s.h_status', 'YES')
+        ->join('student_detail as sd', 'sd.s_id', '=', 's.id')
+        ->where('sd.s_status', 'ACTIVE')
         ->where('s.s_status', 'ACTIVE')
         ->selectRaw("
             s.s_name,
