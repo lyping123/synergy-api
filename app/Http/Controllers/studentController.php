@@ -85,6 +85,9 @@ class studentController extends Controller
             $interval = $firstPaymentDate->diff($currentDate);
             $monthsDifference = ($interval->y * 12) + $interval->m;
 
+            if ($monthsDifference >=33) {
+                return;
+            }
 
             $periodFee =$fee->rp_amount;
 

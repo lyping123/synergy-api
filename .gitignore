@@ -19,6 +19,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/CCTV Phone Usage Detection
 /send_whatapp
 Homestead.json
 Homestead.yaml
