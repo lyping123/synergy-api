@@ -96,10 +96,10 @@ class studentController extends Controller
             $periodsElapsed = intdiv($monthsDifference, 6) + 1;
 
             $totalHostelFee = $periodsElapsed * (int)$periodFee;
-
+            
             $f_receipt=$connection->table('f_receipt as f')
             ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
-            ->where('f.s_id', $fee->receipt_id)
+            ->where('f.id', $fee->receipt_id)
             ->where('f.r_status','ACTIVE')
             ->whereIn('f.cash_bill_option',['Hostel Fee'])
             ->selectRaw('SUM(fd.rp_amount) as total_amount')
