@@ -80,7 +80,6 @@ class studentController extends Controller
         
         $reminders = [];
         $tuitionFees->map(function($fee) use (&$reminders,$connection) {
-            $totalfee=$fee->month_pay*($fee->month_difference-1);
 
             $ptpk_receipt=$connection->table('f_receipt as f')
             ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
