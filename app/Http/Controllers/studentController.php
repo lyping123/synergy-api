@@ -90,7 +90,7 @@ class studentController extends Controller
             ->orderBy('f.id','ASC')
             ->get();
             for($i=2;$i<=4;$i++){
-                $futureDate=clone $ptpk_receipt->r_date;
+                $futureDate=clone $ptpk_receipt->first()->r_date;
                 $futureDate->modify("+".$i." month");
                 if($futureDate->format('Y-m-d')<=date('Y-m-d')){
                     $totalFeeshouldpay=$ptpk_receipt->first()->total_amount * $i;
