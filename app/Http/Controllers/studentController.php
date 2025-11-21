@@ -72,6 +72,7 @@ class studentController extends Controller
         ->where('s.s_status', 'ACTIVE')
         ->selectRaw("
             s.s_name,
+            s.id as s_id,
             SUBSTRING_INDEX(GROUP_CONCAT(f.id ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS receipt_id,
             SUBSTRING_INDEX(GROUP_CONCAT(f.r_date ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS first_payment_date,
             SUBSTRING_INDEX(GROUP_CONCAT(fd.rp_amount ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS rp_amount
@@ -99,7 +100,7 @@ class studentController extends Controller
             
             $f_receipt=$connection->table('f_receipt as f')
             ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
-            ->where('f.id', $fee->receipt_id)
+            ->where('f.s_id', $fee->s_id)
             ->where('f.r_status','ACTIVE')
             ->whereIn('f.cash_bill_option',['Hostel Fee'])
             ->selectRaw('SUM(fd.rp_amount) as total_amount')
