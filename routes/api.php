@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
     Route::get("/reminder/apply_leave",[attendanceController::class,'reminder_apply_leave']);
 
     Route::get("/reminder/tuition_fee",[studentController::class,'remind_tuition_fee']);
+    Route::get("/reminder/tuition_fee_ptpk",[studentController::class,'remind_tuition_ptpk']);
     Route::get("/reminder/hostel_fee",[studentController::class,'remind_hostel_fee']);
 });
 
