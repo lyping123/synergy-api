@@ -67,7 +67,7 @@ class studentController extends Controller
     {
         $connection = DB::connection('student_registration');
         $tuitionFees = $connection->table('student as s')
-        ->join('f_receipt as f','f.s_id','=','student.id')
+        ->join('f_receipt as f','f.s_id','=','s.id')
         ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
         ->where('s.s_status', 'ACTIVE')
         ->where('s.p_method','semester')
