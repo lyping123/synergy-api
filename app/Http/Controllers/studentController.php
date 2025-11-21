@@ -25,7 +25,8 @@ class studentController extends Controller
         
         $reminders = [];
         $tuitionFees->map(function($fee) use (&$reminders,$connection) {
-            $totalfee=$fee->month_pay*$fee->month_difference;
+            $totalfee=$fee->month_pay*($fee->month_difference-1);
+
             $f_receipt=$connection->table('f_receipt as f')
             ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
             ->where('f.s_id', $fee->id)
@@ -47,6 +48,58 @@ class studentController extends Controller
 
             $totalfee-=$f_receipt->first()->total_amount??0;
             $totalfee-=$ptpk_receipt->first()->total_amount??0;
+            if($totalfee>0){
+                $reminders[]=[
+                    "s_name"=>$fee->s_name,
+                    "total_fee_left"=>$totalfee,
+                ];
+            }
+        });
+        return response()->json([
+            "status" => 200,
+            "message" => "fetch tuition fee reminder",
+            "phone_number"=>$this->phone_number,
+            "data" => $reminders
+        ]);
+    }
+
+    public function remind_tuition_ptpk()
+    {
+        $connection = DB::connection('student_registration');
+        $tuitionFees = $connection->table('student as s')
+        ->join('f_receipt as f','f.s_id','=','student.id')
+        ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
+        ->where('s.s_status', 'ACTIVE')
+        ->where('s.p_method','semester')
+        ->where('cash_bill_option','Tuition PTPK')
+        ->orWhere('cash_bill_option','Tuition Fee')
+        ->selectRaw('s.id,s.s_name,SUM(fd.rp_amount) as total_amount,MIN(f.r_date) as first_payment_date')
+        ->groupBy('s.id','s.s_name')
+        ->having("total_amount",">",0)
+        ->get();
+        
+        $reminders = [];
+        $tuitionFees->map(function($fee) use (&$reminders,$connection) {
+            $totalfee=$fee->month_pay*($fee->month_difference-1);
+
+            $ptpk_receipt=$connection->table('f_receipt as f')
+            ->join('f_receipt_detail as fd','fd.r_id','=','f.id')
+            ->where('f.s_id', $fee->id)
+            ->where('f.r_status','ACTIVE')
+            ->where('f.cash_bill_option','Tuition PTPK')
+            ->selectRaw('fd.rp_amount as total_amount, f.r_date')
+            ->orderBy('f.id','ASC')
+            ->get();
+            for($i=2;$i<=4;$i++){
+                $futureDate=clone $fee->first_payment_date;
+                $futureDate->modify("+".$i." month");
+                if($futureDate->format('Y-m-d')<=date('Y-m-d')){
+                    $totalFeeshouldpay=$ptpk_receipt->first()->total_amount * $i;
+                }
+            }
+
+            $totalfee=$totalFeeshouldpay-$fee->total_amount;
+            
             if($totalfee>0){
                 $reminders[]=[
                     "s_name"=>$fee->s_name,
