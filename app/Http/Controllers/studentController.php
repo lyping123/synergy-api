@@ -77,7 +77,7 @@ class studentController extends Controller
             SUBSTRING_INDEX(GROUP_CONCAT(f.r_date ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS first_payment_date,
             SUBSTRING_INDEX(GROUP_CONCAT(fd.rp_amount ORDER BY f.r_date ASC, f.id ASC), ',', 1) AS rp_amount
         ")
-        ->groupBy('s.s_name')
+        ->groupBy('s.s_name', 's.id')
         ->get();
 
         $reminders = [];
