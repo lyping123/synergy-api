@@ -73,9 +73,9 @@ class studentController extends Controller
         ->where('s.p_method','semester')
         ->where('cash_bill_option','Tuition PTPK')
         ->orWhere('cash_bill_option','Tuition Fee')
-        ->selectRaw('s.id,s.s_name,SUM(fd.rp_amount) as total_amount,MIN(f.r_date) as first_payment_date')
-        ->groupBy('s.id','s.s_name')
-        ->having("total_amount",">",0)
+        ->selectRaw('s.id,s.s_name,SUM(fd.rp_amount) as total_amount,MIN(f.r_date) as first_payment_date,s.tuition_fee')
+        ->groupBy('s.id','s.s_name','s.tuition_fee')
+        ->having("total_amount","<","s.tuition_fee")
         ->get();
         
         $reminders = [];
@@ -122,6 +122,7 @@ class studentController extends Controller
         ->join('student_detail as sd', 'sd.s_id', '=', 's.id')
         ->where('sd.s_status', 'ACTIVE')
         ->where('s.s_status', 'ACTIVE')
+        ->where('f.cash_bill_option','Hostel Fee')
         ->selectRaw("
             s.s_name,
             s.id as s_id,
