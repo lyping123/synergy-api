@@ -122,7 +122,6 @@ class studentController extends Controller
         ->join('student_detail as sd', 'sd.s_id', '=', 's.id')
         ->where('sd.s_status', 'ACTIVE')
         ->where('s.s_status', 'ACTIVE')
-        ->where('f.cash_bill_option','Hostel Fee')
         ->selectRaw("
             s.s_name,
             s.id as s_id,
@@ -160,8 +159,13 @@ class studentController extends Controller
             ->groupBy('f.s_id')
             ->get();
 
+
             $totalPaid = $f_receipt->first()->total_amount ?? 0;
-            $totalFeeLeft = $totalHostelFee - $totalPaid;
+            if ($totalPaid==0) {
+                $totalFeeLeft=0;
+            }else{
+                $totalFeeLeft = $totalHostelFee - $totalPaid;
+            }
 
             if ($totalFeeLeft > 0) {
                 $reminders[] = [
