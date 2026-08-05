@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\pretestStudent;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 
 class studentController extends Controller
@@ -45,12 +46,21 @@ class studentController extends Controller
 
     public function add_pretest_student(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'ic_number' => 'required|string',
-            'phone_number' => 'required|string',
-            'course' => 'required|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'ic_number' => 'required|string',
+                'phone_number' => 'required|string',
+                'course' => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                "status" => 422,
+                "message" => "validation error",
+                "errors" => $e->errors()
+            ], 422);
+        }
+        
 
         $student = pretestStudent::create($validatedData);
 
@@ -72,13 +82,22 @@ class studentController extends Controller
             ]);
         }
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string',
-            'ic_number' => 'sometimes|required|string',
-            'phone_number' => 'sometimes|required|string',
-            'course' => 'sometimes|required|string',
-            'status' => 'sometimes|required|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'sometimes|required|string',
+                'ic_number' => 'sometimes|required|string',
+                'phone_number' => 'sometimes|required|string',
+                'course' => 'sometimes|required|string',
+                'status' => 'sometimes|required|string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                "status" => 422,
+                "message" => "validation error",
+                "errors" => $e->errors()
+            ], 422);
+        }
+        
 
         $student->update($validatedData);
 
