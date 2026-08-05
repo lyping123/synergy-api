@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\pretestStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,98 @@ class studentController extends Controller
         $this->phone_number = env('WHATSAPP_PHONE_NUMBER', '+60129253398');
     }
     
+    public function pretest_student()
+    {
+        $students=pretestStudent::all();
+        return response()->json([
+            "status" => 200,
+            "message" => "fetch all pretest students",
+            "data" => $students
+        ]);
+
+    }
+    public function pretest_student_by_id($parameter)
+    {
+        $student = pretestStudent::find($parameter);
+
+        if ($student) {
+            return response()->json([
+                "status" => 200,
+                "message" => "fetch pretest student by id",
+                "data" => $student
+            ]);
+        } else {
+            return response()->json([
+                "status" => 404,
+                "message" => "pretest student not found"
+            ]);
+        }
+    }
+
+    public function add_pretest_student(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'ic_number' => 'required|string',
+            'phone_number' => 'required|string',
+            'course' => 'required|string',
+        ]);
+
+        $student = pretestStudent::create($validatedData);
+
+        return response()->json([
+            "status" => 201,
+            "message" => "pretest student added successfully",
+            "data" => $student
+        ]);
+    }
+
+    public function update_pretest_student(Request $request, $id)
+    {
+        $student = pretestStudent::find($id);
+
+        if (!$student) {
+            return response()->json([
+                "status" => 404,
+                "message" => "pretest student not found"
+            ]);
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string',
+            'ic_number' => 'sometimes|required|string',
+            'phone_number' => 'sometimes|required|string',
+            'course' => 'sometimes|required|string',
+            'status' => 'sometimes|required|string',
+        ]);
+
+        $student->update($validatedData);
+
+        return response()->json([
+            "status" => 200,
+            "message" => "pretest student updated successfully",
+            "data" => $student
+        ]);
+    }
+
+    public function delete_pretest_student($id)
+    {
+        $student = pretestStudent::find($id);
+
+        if (!$student) {
+            return response()->json([
+                "status" => 404,
+                "message" => "pretest student not found"
+            ]);
+        }
+
+        $student->delete();
+
+        return response()->json([
+            "status" => 200,
+            "message" => "pretest student deleted successfully"
+        ]);
+    }
 
     public function remind_tuition_fee()
     {
