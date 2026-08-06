@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pretest_students', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('ic_number')->unique();
+            $table->string('ic_number');
             $table->string('phone_number');
             $table->string('course');
             $table->string('status')->default('pending');

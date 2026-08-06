@@ -52,6 +52,7 @@ class studentController extends Controller
                 'ic_number' => 'required|string',
                 'phone_number' => 'required|string',
                 'course' => 'required|string',
+                'status' => 'required|string',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
